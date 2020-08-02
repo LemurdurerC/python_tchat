@@ -3,10 +3,7 @@ import socket
 import select 
 import sys 
 
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
-if len(sys.argv) != 3: 
-	print ("Correct usage: script, IP address, port number")
-	exit() 
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  
 IP_address = "kodaline.fun" 
 Port = 5000 
 server.connect((IP_address, Port)) 

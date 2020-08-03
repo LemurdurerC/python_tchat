@@ -71,11 +71,12 @@ def clientthread(conn, addr):
 clients who's object is not the same as the one sending 
 the message """
 def get_key_by_value(socket):
-	for ip,sock in sock_client.iteritems():
+	for ip,sock in sock_client.items():
 		if sock == socket:
 			return ip 
 def broadcast(message, connection):
-	print ("<" + str(get_key_by_value(connection)) + "> " + message.decode())
+	#print ("<" + str(get_key_by_value(connection)) + "> " + message.decode())
+	print(message.decode())
 	for clients in list_of_clients:
 		if clients!=connection: 
 			try: 

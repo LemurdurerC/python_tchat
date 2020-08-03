@@ -37,7 +37,7 @@ increased as per convenience.
 server.listen(100) 
 
 list_of_clients = [] 
-
+sock_client= {}
 def clientthread(conn, addr): 
 
 	# sends a message to the client whose user object is conn 
@@ -47,29 +47,36 @@ def clientthread(conn, addr):
 			try: 
 				message = conn.recv(2048) 
 				if message: 
-
+	
 					"""prints the message and address of the 
 					user who just sent the message on the server 
 					terminal"""
-					print ("<" + addr[0] + "> " + message) 
+					 
 
 					# Calls broadcast function to send message to all 
-					message_to_send = "<" + addr[0] + "> " + message 
-					broadcast(message_to_send.encode(), conn) 
+					message_to_send = "<" + addr[0] + "> " + message.decode() 
+					broadcast(message_to_send.encode(), conn)
+					#private(message_to_send) 
 
 				else: 
 					"""message may have no content if the connection 
 					is broken, in this case we remove the connection"""
 					remove(conn) 
 
-			except: 
+			except Exception as e: 
+				print(e)
 				continue
 
 """Using the below function, we broadcast the message to all 
 clients who's object is not the same as the one sending 
 the message """
-def broadcast(message, connection): 
-	for clients in list_of_clients: 
+def get_key_by_value(socket):
+	for ip,sock in sock_client.iteritems():
+		if sock == socket:
+			return ip 
+def broadcast(message, connection):
+	print ("<" + str(get_key_by_value(connection)) + "> " + message.decode())
+	for clients in list_of_clients:
 		if clients!=connection: 
 			try: 
 				clients.send(message) 
@@ -77,7 +84,8 @@ def broadcast(message, connection):
 				clients.close() 
 
 				# if the link is broken, we remove the client 
-				remove(clients) 
+				remove(clients)
+	 
 
 """The following function simply removes the object 
 from the list that was created at the beginning of 
@@ -85,7 +93,13 @@ the program"""
 def remove(connection): 
 	if connection in list_of_clients: 
 		list_of_clients.remove(connection) 
-
+def private(message):
+	try:
+		conn = sock_client["80.215.205.111"]
+		conn.send(message.encode())
+	except Exception as e:
+		print(e)
+	pass
 while True: 
 
 	"""Accepts a connection request and stores two parameters, 
@@ -96,7 +110,8 @@ while True:
 
 	"""Maintains a list of clients for ease of broadcasting 
 	a message to all available people in the chatroom"""
-	list_of_clients.append(conn) 
+	list_of_clients.append(conn)
+	sock_client[str(addr[0])] = conn 
 
 	# prints the address of the user that just connected 
 	print (addr[0] + " connected")

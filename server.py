@@ -50,13 +50,13 @@ def clientthread(conn, addr):
 	
 					"""prints the message and address of the 
 					user who just sent the message on the server 
-					terminal"""
+		0			terminal"""
 					 
 
 					# Calls broadcast function to send message to all 
-					message_to_send = "<" + addr[0] + "> " + message.decode() 
-					broadcast(message_to_send.encode(), conn)
-					#private(message_to_send) 
+					message_to_send = message.decode() 
+					#broadcast(message_to_send.encode(), conn)
+					private(message_to_send.encode(),addr[0],"192.168.1.36") 
 
 				else: 
 					"""message may have no content if the connection 
@@ -75,8 +75,8 @@ def get_key_by_value(socket):
 		if sock == socket:
 			return ip 
 def broadcast(message, connection):
-	#print ("<" + str(get_key_by_value(connection)) + "> " + message.decode())
-	print(message.decode())
+	print ("<" + str(get_key_by_value(connection)) + "> " + message.decode())
+	#print(message.decode())
 	for clients in list_of_clients:
 		if clients!=connection: 
 			try: 
@@ -94,13 +94,22 @@ the program"""
 def remove(connection): 
 	if connection in list_of_clients: 
 		list_of_clients.remove(connection) 
-def private(message):
-	try:
-		conn = sock_client["80.215.205.111"]
-		conn.send(message.encode())
-	except Exception as e:
-		print(e)
-	pass
+def private(message,sender,receiver):
+	if sender == receiver:
+		print("Vous ne pouvez pas envoyer des mp à vous même")
+		#lever une exception
+		pass
+	else:
+		try:
+			conn = sock_client[receiver]
+			conn.send(message)
+			print ("<from> " +str(sender)+" <to> " +str(receiver)+" "+message.decode())
+		except Exception as e:
+			print("Utilisateur off")
+			message = "Utilisateur off"
+			conn = sock_client[sender]
+			conn.send(message.encode())
+		pass
 while True: 
 
 	"""Accepts a connection request and stores two parameters, 
